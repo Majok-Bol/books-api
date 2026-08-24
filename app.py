@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,request
 app=Flask(__name__)
 books = [
     {
@@ -122,9 +122,52 @@ books = [
         "year": 2025
     }
 ]
-# print(books)
-@app.route('/')
-def hello():
-    return 'Hello,from Flask'
+
+#fetch all books
+@app.get('/api/v1/books')
+def get_books():
+    return books
+#get specific book by its id
+@app.get('/api/v1/books/<int:id>')
+def get_book_by_id(id):
+    for book in books:
+        if book['id']==id:
+          return book
+    return {"message":"Book not found"},404
+    
+#create book
+@app.post("/api/v1/books")
+def create_book():
+    data=request.get_json()
+    new_book={
+        "id":len(books)+1,
+        "title":data["title"],
+        "author":data["author"],
+        "year":data["year"]
+    }
+    books.append(new_book)
+    return new_book,201
+#modify part of an existing data
+@app.patch("/api/v1/books/<int:id>")
+def update_book(id):
+    data=request.get_json()
+    for book in books:
+        if book["id"]==id:
+            if "title" in data:
+                book["title"]=data["title"]
+            if "author" in data:
+                book["author"]=data["author"]
+            if "year" in data:
+                book["year"]=data["year"]
+            return book
+    return {"error":"Book not found"},404
+#delete a book
+@app.delete("/api/v1/books/<int:id>")
+def delete_book(id):
+    for book in books:
+        if book['id']==id:
+            books.remove(book)
+            return "",204
+    return {"error":"Book not found"},404
 if __name__=="__main__":
     app.run(debug=True)
