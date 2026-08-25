@@ -1,4 +1,4 @@
-from flask import Flask,request
+from flask import Flask,request,jsonify
 app=Flask(__name__)
 books = [
     {
@@ -126,7 +126,74 @@ books = [
 #fetch all books
 @app.get('/api/v1/books')
 def get_books():
-    return books
+    #query parameters
+    search=request.args.get("search")
+    print("Search parameter: ",search)
+    author=request.args.get("author")
+    print("Author parameter: ",author)
+    year=request.args.get("year")
+    print("Year parameter: ",year)
+    #pagination parameters
+    page=request.args.get("page",default=1,type=int)
+    print("Page parameter: ",page)
+    per_page=request.args.get("per_page",default=5,type=int)
+    print("per_page parameter: ",per_page)
+    #validate pagination
+    if page<1:
+        return jsonify({
+            "error":"Page must be greater than or equal to 1"
+        }),400
+    if per_page<1 or per_page>100:
+        return jsonify({
+            "error":"per_page must be between 1 and 100"
+        }),400
+    #start with all books
+    filtered_books=books
+    # print("Filtered books: ",filtered_books)
+    #search by title
+    if search:
+        filtered_books=[
+            book for book in filtered_books
+            if search.lower() in book["title"].lower()
+        ]
+    #filter by author
+    if author:
+        filtered_books=[
+            book for book in filtered_books
+            if author.lower() in book["author"].lower()
+        ]
+    #filter by publication year
+    if year is not None:
+        try:
+            year=int(year)
+        except ValueError:
+            return jsonify({
+                "error":"Year must be an integer"
+            }),400
+        filtered_books=[
+            book for book in filtered_books
+            if book["year"]==year
+        ]
+    #total number of matching books
+    total=len(filtered_books)
+    #pagination calculation
+    start=(page-1)*per_page
+    end=start+per_page
+    paginated_books=filtered_books[start:end]
+    #return response
+    return jsonify({
+        "data":paginated_books,
+        "pagination":{
+            "page":page,
+            "per_page":per_page,
+            "total":total,
+            "pages":(total+per_page-1)//per_page
+
+        }
+    }),200
+
+   
+    return book_list
 #get specific book by its id
 @app.get('/api/v1/books/<int:id>')
 def get_book_by_id(id):
