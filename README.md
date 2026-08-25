@@ -1,5 +1,3 @@
-Absolutely. Since this is a beginner Flask REST API project, the README should explain **what the project does, how to run it, the endpoints, HTTP methods, request bodies, and example responses**.
-
 # Flask Books REST API
 
 A beginner-friendly REST API built with **Python and Flask** for managing a collection of books.
