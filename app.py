@@ -195,8 +195,6 @@ def get_books():
         }
     }),200
 
-   
-    return book_list
 #get specific book by its id
 @app.get('/api/v1/books/<int:id>')
 def get_book_by_id(id):
