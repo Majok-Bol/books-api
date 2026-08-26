@@ -123,7 +123,9 @@ books = [
     }
 ]
 
-#fetch all books
+#filter books
+#search a book
+#add pagination
 @app.get('/api/v1/books')
 def get_books():
     #query parameters
@@ -153,14 +155,12 @@ def get_books():
     #search by title
     if search:
         filtered_books=[
-            book for book in filtered_books
-            if search.lower() in book["title"].lower()
+            book for book in filtered_books if search.lower() in book["title"].lower()
         ]
     #filter by author
     if author:
         filtered_books=[
-            book for book in filtered_books
-            if author.lower() in book["author"].lower()
+            book for book in filtered_books if author.lower() in book["author"].lower()
         ]
     #filter by publication year
     if year is not None:
@@ -171,15 +171,18 @@ def get_books():
                 "error":"Year must be an integer"
             }),400
         filtered_books=[
-            book for book in filtered_books
-            if book["year"]==year
+            book for book in filtered_books if book["year"]==year
         ]
     #total number of matching books
     total=len(filtered_books)
+    print("Total: ",total)
     #pagination calculation
     start=(page-1)*per_page
+    print("Start: ",start)
     end=start+per_page
+    print("End: ",end)
     paginated_books=filtered_books[start:end]
+    print("Paginated books: ",paginated_books)
     #return response
     return jsonify({
         "data":paginated_books,
