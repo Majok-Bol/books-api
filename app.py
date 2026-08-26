@@ -138,7 +138,7 @@ def get_books():
     #pagination parameters
     page=request.args.get("page",default=1,type=int)
     print("Page parameter: ",page)
-    per_page=request.args.get("per_page",default=5,type=int)
+    per_page=request.args.get("per_page",default=1,type=int)
     print("per_page parameter: ",per_page)
     #validate pagination
     if page<1:
